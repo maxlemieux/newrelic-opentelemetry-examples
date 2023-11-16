@@ -8,10 +8,14 @@ receivers:
       - topics
       - consumers
     auth:
+      sasl:
+        username: $CLUSTER_API_KEY
+        password: $CLUSTER_API_SECRET
+        mechanism: PLAIN
       tls:
-        ca_file: ./etc/otelcol/pem/ca.pem
-        cert_file: ./etc/otelcol/pem/cert.pem
-        key_file: ./etc/otelcol/pem/key.pem
+        #ca_file: ./etc/otelcol/pem/ca.pem
+        #cert_file: ./etc/otelcol/pem/cert.pem
+        #key_file: ./etc/otelcol/pem/key.pem
     collection_interval: 30s
 
 
@@ -19,13 +23,15 @@ receivers:
     config:
       scrape_configs:
         - job_name: "confluent"
-          scrape_interval: 60s # Do not go any lower than this or you'll hit rate limits
+          scrape_interval: 1m
+          scrape_timeout: 1m
+          honor_timestamps: true
           static_configs:
-            - targets: ["api.telemetry.confluent.cloud"]
+            - targets: ['api.telemetry.confluent.cloud']
           scheme: https
           basic_auth:
-            username: $CONFLUENT_API_ID
-            password: $CONFLUENT_API_SECRET
+            username: $CLOUD_API_KEY
+            password: $CLOUD_API_SECRET
           metrics_path: /v2/metrics/cloud/export
           params:
             "resource.kafka.id":
@@ -44,6 +50,7 @@ processors:
 service:
   telemetry:
     logs:
+      level: "debug"
   pipelines:
     metrics:
       receivers: [prometheus]
