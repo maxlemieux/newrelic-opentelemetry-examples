@@ -17,4 +17,5 @@ services:
       - CLUSTER_API_KEY
       - CLUSTER_API_SECRET
       - CLUSTER_ID
-
+      - CLOUD_API_KEY
+      - CLOUD_API_SECRET
